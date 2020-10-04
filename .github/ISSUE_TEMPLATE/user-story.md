@@ -1,29 +1,36 @@
 ---
 name: User story
-about: Functional user story for Altinn Studio
-
+about: Create a user story for Altinn Studio
+labels: kind/user-story
 ---
 
-**Functional architect/designer:** @-mention
-**Technical architect:** @-mention
+## Description
+> Document the need briefly for the story. Start with the "who, what, why" eg "As a (type of user), I want (some goal), so that (reason)." The title of the user story should reflect this need in a shorter way.
 
-**Description**
-Document the need briefly/for functional stories "As a user X I need Y so that Z"
+## Screenshots
+> Screenshots or links to Figma (make sure your sketch is public)
 
-**Sketch (if relevant)**
-(Screenshot and link to Figma, make sure your sketch is public!)
+## Considerations
+> Describe input (beyond tasks) on how the user story should be solved can be put here.
 
-**Navigation from/to (if relevant)**
-This functionality is reached from...
+## Acceptance criteria
+> Describe criteria here (i.e. What is allowed/not allowed (negative tesing), validations, error messages and warnings etc.)
 
-**Technical considerations**
-Input (beyond tasks) on how the user story should be solved can be put here.
+## Specification tasks
 
-**Acceptance criterea**
-- What is allowed/not allowed
-- Validations
-- Error messages and warnings
-- ...
+- [ ] Development tasks are defined
+- [ ] Test design / decide test need
 
-**Tasks**
-- [ ] Example task
+## Development tasks
+> Add tasks here
+
+## Definition of done
+Verify that this issue meets [DoD](https://confluence.brreg.no/display/T3KP/Definition+of+Done#DefinitionofDone-DoD%E2%80%93utvikling) (Only for project members) before closing.
+
+- [ ] Documentation is updated (if relevant)
+  - [ ] Technical documentation (docs.altinn.studio)
+  - [ ] User documentation (altinn.github.io/docs)
+- [ ] QA
+- [ ] Manual test is complete (if relevant)
+- [ ] Automated test is implemented (if relevant)
+- [ ] All tasks in this userstory are closed (i.e. remaining tasks are moved to other user stories or marked obsolete)

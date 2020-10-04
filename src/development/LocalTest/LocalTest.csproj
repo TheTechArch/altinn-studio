@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Altinn.Authorization.ABAC" Version="0.0.3-alpha" />
+    <PackageReference Include="Altinn.Common.PEP" Version="1.0.34-alpha" />
+    <PackageReference Include="Altinn.Platform.Models" Version="1.0.4-alpha" />
+    <PackageReference Include="Altinn.Platform.Storage.Interface" Version="2.2.5" />
+    <PackageReference Include="JWTCookieAuthentication" Version="2.4.0-alpha" />
+    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.11.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.8" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+  </ItemGroup>
+
+</Project>

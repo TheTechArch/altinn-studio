@@ -1,0 +1,3155 @@
+{
+	"info": {
+		"_postman_id": "1de225d2-04b9-4fab-a2eb-69388da4cd2a",
+		"name": "Storage",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "SetUp Cookies",
+			"item": [
+				{
+					"name": "Authenticate user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "46495365-2417-416f-a522-c3d0f2c6cde6",
+								"exec": [
+									"var current_timestamp = new Date();\r",
+									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a510ccaf-fe77-4be0-bd57-8e66df3f5948",
+								"exec": [
+									"const jar = pm.cookies.jar();",
+									"var domain = pm.environment.get(\"envUrl\");",
+									"jar.clear(domain, function (error) {",
+									"    if (error) {",
+									"        console.log(\"error\", error);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/hal+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"UserName\": \"{{testUserName}}\",\r\n    \"UserPassword\": \"{{testUserPassword}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{envUrl}}/api/authentication/authenticatewithpassword",
+							"protocol": "https",
+							"host": [
+								"{{envUrl}}"
+							],
+							"path": [
+								"api",
+								"authentication",
+								"authenticatewithpassword"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Runtime Cookie",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "394a9bd7-8d62-4e75-9704-800c38b96a29",
+								"exec": [
+									"var responseAltinnStudioCookie = postman.getResponseCookie(\"AltinnStudioRuntime\");",
+									"responseAltinnStudioCookie = responseAltinnStudioCookie.value.toString();",
+									"pm.environment.set(\"AltinnStudioRuntime\",responseAltinnStudioCookie);",
+									"",
+									"const cookieJar = pm.cookies.jar();",
+									"var domain = pm.environment.get(\"envUrl\");",
+									"cookieJar.set(domain,\"AltinnStudioRuntime\",responseAltinnStudioCookie,function(error,cookie){",
+									"    if(error)",
+									"    {",
+									"        console.log(\"error\",error);",
+									"    }",
+									"});",
+									"",
+									"cookieJar.clear(domain, function (error){",
+									"    if(error)",
+									"    {",
+									"        console.log(\"error\",error);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "5450391e-3c33-434b-a223-8a17ad2c8f5a",
+								"exec": [
+									"pm.environment.set(\"AltinnStudioRuntime\",\"\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/authentication/api/v1/authentication?goto=https://{{org}}.apps.{{envUrl}}/{{org}}/{{app}}/",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"authentication",
+								"api",
+								"v1",
+								"authentication"
+							],
+							"query": [
+								{
+									"key": "goto",
+									"value": "https://{{org}}.apps.{{envUrl}}/{{org}}/{{app}}/"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Party Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e602f08d-bb11-4233-bf83-d7f2280d1297",
+								"exec": [
+									"if (pm.response.code == 200) {",
+									"    var jsonData = pm.response.json();",
+									"    var partyId = jsonData.partyId;",
+									"    var ssn = jsonData.party.ssn;",
+									"    pm.environment.set(\"SSN\", ssn);",
+									"    pm.environment.set(\"instanceOwnerId\", partyId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b39d980-2941-4358-a34a-4c37601ab12b",
+								"exec": [
+									"const cookieJar = pm.cookies.jar();",
+									"var domain = pm.environment.get(\"envUrl\");",
+									"cookieJar.clear(domain, function (error){",
+									"    if(error)",
+									"    {",
+									"        console.log(\"error\",error);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{org}}.apps.{{envUrl}}/{{org}}/{{app}}/api/v1/profile/user",
+							"protocol": "https",
+							"host": [
+								"{{org}}",
+								"apps",
+								"{{envUrl}}"
+							],
+							"path": [
+								"{{org}}",
+								"{{app}}",
+								"api",
+								"v1",
+								"profile",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Applications",
+			"item": [
+				{
+					"name": "POST Create App",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7b7d87c1-ed09-483a-900b-dbe1190932c5",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "f351b905-5144-4bf9-bab5-97a953f469d6",
+								"exec": [
+									"pm.test(\"Platform - Storage - Application - Create App - Not possible for a person - Status - 403\", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{org}}-{{app}}\",\r\n    \"versionId\": \"1\",\r\n    \"org\": \"{{org}}\",\r\n    \"title\": {\r\n        \"nb\": \"{{app}}\"\r\n    },\r\n    \"validFrom\": \"{{current_timestamp}}\",\r\n    \"dataTypes\": [\r\n        {\r\n            \"id\": \"default\",\r\n            \"allowedContentTypes\": [\r\n                \"application/xml\"\r\n            ],\r\n            \"appLogic\": {\r\n                \"autoCreate\": true,\r\n                \"classRef\": \"Altinn.App.Models.flyttemelding\",\r\n                \"schemaRef\": null\r\n            },\r\n            \"taskId\": \"Task_1\",\r\n            \"maxCount\": 0,\r\n            \"minCount\": 0\r\n        },\r\n        {\r\n            \"id\": \"ref-data-as-pdf\",\r\n            \"allowedContentTypes\": [\r\n                \"application/pdf\"\r\n            ],\r\n            \"taskId\": \"Task_1\",\r\n            \"maxCount\": 1,\r\n            \"minCount\": 1\r\n        },\r\n        {\r\n            \"id\": \"attachment\",\r\n            \"allowedContentTypes\": [\r\n                \"application/octet-stream\"\r\n            ],\r\n            \"appLogic\": {\r\n                \"autoCreate\": false\r\n            },\r\n            \"taskId\": \"Task_1\",\r\n            \"maxCount\": 1,\r\n            \"minCount\": 0\r\n        }\r\n    ],\r\n    \"partyTypesAllowed\": {\r\n        \"bankruptcyEstate\": false,\r\n        \"organisation\": false,\r\n        \"person\": false,\r\n        \"subUnit\": false\r\n    },\r\n    \"created\": \"{{current_timestamp}}\",\r\n    \"lastChanged\": \"{{current_timestamp}}\"\r\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/applications?appId={{org}}/{{app}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"applications"
+							],
+							"query": [
+								{
+									"key": "appId",
+									"value": "{{org}}/{{app}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET All Apps",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "532ca54c-4898-4c0d-972a-71ead479dc00",
+								"exec": [
+									"pm.test(\"Platform - Storage - Applications - GET All Apps - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/applications/{{org}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"applications",
+								"{{org}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET App by name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dcb34526-1291-48cf-a8a4-310e38e1ea81",
+								"exec": [
+									"pm.test(\"Platform - Storage - Applications - Get App by name - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Platform - Storage - Applications - Get App by name - Content - Matches\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var org = pm.environment.get(\"org\");\r",
+									"    var app = pm.environment.get(\"app\");\r",
+									"    var expectedAppName = org.toString() + '/' + app.toString();\r",
+									"    pm.expect(jsonData.id).to.eql(expectedAppName);\r",
+									"    var dataTypes = jsonData.dataTypes;\r",
+									"    var dataTypesCount = dataTypes.length;\r",
+									"    for(var i=0; i<dataTypesCount; i++){\r",
+									"        if (isGuid(dataTypes[i].id)){\r",
+									"            pm.environment.set(\"attachmentElementType\", dataTypes[i].id);\r",
+									"            break;\r",
+									"        }\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"function isGuid(stringToTest) {\r",
+									"    var regexGuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;\r",
+									"    return regexGuid.test(stringToTest);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "f35b6139-ac26-4be9-8fa3-32b1c1dde75d",
+								"exec": [
+									"pm.environment.set(\"attachmentElementType\",\"\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/applications/{{org}}/{{app}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"applications",
+								"{{org}}",
+								"{{app}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Edit App",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8c2bb31b-cf4d-401e-9731-85fbe9c08b4e",
+								"exec": [
+									"pm.test(\"Platform - Storage - Application - Edit  App - Not possible for a person - Status - 403\", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{org}}/{{app}}\",\r\n    \"versionId\": \"2\",\r\n    \"org\": \"{{org}}\",\r\n    \"title\": {\r\n        \"nb\": \"{{app}}\"\r\n    },\r\n    \"validFrom\": \"{{current_timestamp}}\",\r\n    \"dataTypes\": [\r\n        {\r\n            \"id\": \"default\",\r\n            \"allowedContentTypes\": [\r\n                \"application/xml\"\r\n            ],\r\n            \"appLogic\": {\r\n                \"autoCreate\": true,\r\n                \"classRef\": \"Altinn.App.Models.flyttemelding\",\r\n                \"schemaRef\": null\r\n            },\r\n            \"taskId\": \"Task_1\",\r\n            \"maxCount\": 0,\r\n            \"minCount\": 0\r\n        },\r\n        {\r\n            \"id\": \"ref-data-as-pdf\",\r\n            \"allowedContentTypes\": [\r\n                \"application/pdf\"\r\n            ],\r\n            \"taskId\": \"Task_1\",\r\n            \"maxCount\": 1,\r\n            \"minCount\": 1\r\n        },\r\n        {\r\n            \"id\": \"attachment\",\r\n            \"allowedContentTypes\": [\r\n                \"application/octet-stream\"\r\n            ],\r\n            \"appLogic\": {\r\n                \"autoCreate\": false\r\n            },\r\n            \"taskId\": \"Task_1\",\r\n            \"maxCount\": 1,\r\n            \"minCount\": 0,\r\n            \"maxSize\": 2\r\n        }\r\n    ],\r\n    \"partyTypesAllowed\": {\r\n        \"bankruptcyEstate\": false,\r\n        \"organisation\": true,\r\n        \"person\": true,\r\n        \"subUnit\": false\r\n    },\r\n    \"created\": \"{{current_timestamp}}\",\r\n    \"lastChanged\": \"{{current_timestamp}}\"\r\n}"
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/applications/{{org}}/{{app}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"applications",
+								"{{org}}",
+								"{{app}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Text",
+			"item": [
+				{
+					"name": "GET App Texts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a46136ed-0e83-481e-900d-2fb6de204e7f",
+								"exec": [
+									"pm.test(\"Platform - Storage - Applications - Get App texts - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "04629225-c223-4940-802f-c5fd3faa93aa",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/applications/{{org}}/{{app}}/texts/nb",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"applications",
+								"{{org}}",
+								"{{app}}",
+								"texts",
+								"nb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST App Texts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "93f6fc20-8ec8-401a-843d-888ae8921baf",
+								"exec": [
+									"pm.test(\"Platform - Storage - Applications - POST Upload App texts - Status - 403\", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a8dd63e4-0184-44e7-98c9-ff0dd0d64ef4",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{org}}-{{app}}-nb\",\r\n    \"org\": \"{{org}}\",\r\n    \"language\": \"nb\",\r\n    \"resources\": [\r\n        {\r\n            \"id\": \"testid\",\r\n            \"value\": \"testvalue\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/applications/{{org}}/{{app}}/texts",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"applications",
+								"{{org}}",
+								"{{app}}",
+								"texts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT App Texts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "61b33644-26f0-418c-b2e1-51f34905a27d",
+								"exec": [
+									"pm.test(\"Platform - Storage - Applications - PUT Edit App texts - Status - 403\", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "49d26310-3fa7-4bfd-a656-90b1f7dcd9b1",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{org}}-{{app}}-nb\",\r\n    \"org\": \"{{org}}\",\r\n    \"language\": \"nb\",\r\n    \"resources\": [\r\n        {\r\n            \"id\": \"testid\",\r\n            \"value\": \"testvalue\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/applications/{{org}}/{{app}}/texts/nb",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"applications",
+								"{{org}}",
+								"{{app}}",
+								"texts",
+								"nb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE App Texts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5c516b38-10b1-47c7-89ee-ec2d766fc277",
+								"exec": [
+									"pm.test(\"Platform - Storage - Applications - DELETE App texts - Status - 403\", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "02623ec8-316d-4489-907b-d579c02ba0a9",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/applications/{{org}}/{{app}}/texts/nb",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"applications",
+								"{{org}}",
+								"{{app}}",
+								"texts",
+								"nb"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Instances",
+			"item": [
+				{
+					"name": "POST App instance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "31e44934-dcf2-4fc0-a49c-02f09eb47e16",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instances - Add app instance - Status - 201 \", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"    var jsonData = pm.response.json();\r",
+									"    if(pm.expect(jsonData.instanceOwnerId).not.eql(null))\r",
+									"    {\r",
+									"        var instanceId = jsonData.id;\r",
+									"        instanceId = instanceId.toString();\r",
+									"        instanceId = instanceId.split('/');\r",
+									"        instanceId = instanceId[1];\r",
+									"        pm.environment.set('instanceId',instanceId);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9a82e8b1-e687-4521-8463-b8338d0309ef",
+								"exec": [
+									"pm.environment.set(\"instanceId\",\"\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instanceOwner\": {\n    \t\"partyId\": \"{{instanceOwnerId}}\"\n    },\n    \"appId\" : \"{{org}}/{{app}}\",\n    \"dueBefore\": \"2019-06-01T12:00:00Z\",\n    \"visibleAfter\": \"2019-05-20T00:00:00Z\",\n    \"title\": { \"nb\": \"Arbeidsmelding\" },\n    \"process\": {\n        \"started\": \"{{current_timestamp}}\",\n        \"startEvent\": \"StartEvent_1\",\n        \"currentTask\": {\n            \"flow\": 2,\n            \"started\": \"{{current_timestamp}}\",\n            \"elementId\": \"Task_1\",\n            \"name\": \"Utfylling\",\n            \"altinnTaskType\": \"data\",\n            \"ended\": null,\n            \"validated\": null\n        },\n        \"ended\": null,\n        \"endEvent\": null\n    }\n}"
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances?appId={{org}}/{{app}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances"
+							],
+							"query": [
+								{
+									"key": "appId",
+									"value": "{{org}}/{{app}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Instances",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "17eaf37c-ecc2-4ce4-91cc-b52e139d7b67",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instances - Get All instances - Missing Request parameter - Status - 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Instances by InstanceOwnerID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e68e0b6b-bcd1-461d-9a36-1c05f7acc51d",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instances - Get Instance by onwerId - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/hal+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances?instanceOwner.partyId={{instanceOwnerId}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances"
+							],
+							"query": [
+								{
+									"key": "instanceOwner.partyId",
+									"value": "{{instanceOwnerId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Instances with date filters",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "070bceb1-efae-4025-8c34-647a73b4fe39",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instances - Get Instances with Date filter - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b1247263-a642-468e-bccf-7ed6e9b657da",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances?appId={{org}}/{{app}}&created=gt:{{current_timestamp}}&lastChanged=gte:2019-08-12T11:20:10.2003387Z&instanceOwner.partyId={{instanceOwnerId}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances"
+							],
+							"query": [
+								{
+									"key": "appId",
+									"value": "{{org}}/{{app}}"
+								},
+								{
+									"key": "created",
+									"value": "gt:{{current_timestamp}}"
+								},
+								{
+									"key": "lastChanged",
+									"value": "gte:2019-08-12T11:20:10.2003387Z"
+								},
+								{
+									"key": "instanceOwner.partyId",
+									"value": "{{instanceOwnerId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Instances with process filters",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c5a09780-6ee8-4859-890d-8906342b1200",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instances - Get Instances with Process filter  - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances?appId={{org}}/{{app}}&process.currentTask=Task_1&instanceOwner.partyId={{instanceOwnerId}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances"
+							],
+							"query": [
+								{
+									"key": "appId",
+									"value": "{{org}}/{{app}}"
+								},
+								{
+									"key": "process.currentTask",
+									"value": "Task_1"
+								},
+								{
+									"key": "instanceOwner.partyId",
+									"value": "{{instanceOwnerId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Edit Process",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "83fd401b-a3f1-4b6d-b42d-9b12655b3b01",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instances - Edit Process - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"started\": \"{{current_timestamp}}\",\r\n        \"startEvent\": \"StartEvent_1\",\r\n        \"currentTask\": {\r\n            \"flow\": 2,\r\n            \"started\": \"{{current_timestamp}}\",\r\n            \"elementId\": \"Task_1\",\r\n            \"name\": \"Utfylling\",\r\n            \"altinnTaskType\": \"data\"\r\n        }\r\n    }"
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/process",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"process"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET App Instance by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ea9e5563-ddab-45ee-879b-6fff19fce69e",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instances - Get Instance by Id - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Data",
+			"item": [
+				{
+					"name": "POST Add Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fdacb491-b74c-46f6-b780-da89a0d01e5b",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Data - Add Instance Data - Status - 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"    pm.environment.set(\"dataGuid\",pm.response.json().id);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "338b57ec-b789-45b7-a2f6-0d98c96024cf",
+								"exec": [
+									"pm.environment.set(\"dataGuid\",\"\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<?xml version=\"1.0\"?>\r\n<Skjema xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" skjemanummer=\"1472\" spesifikasjonsnummer=\"9812\" blankettnummer=\"AFP-01\" tittel=\"Arbeidsgiverskjema AFP\" gruppeid=\"8818\">\r\n  <OpplysningerOmArbeidstakeren-grp-8819 gruppeid=\"8819\">\r\n    <Skjemainstans-grp-8854 gruppeid=\"8854\">\r\n      <Journalnummer-datadef-33316 orid=\"33316\">98274</Journalnummer-datadef-33316>\r\n    </Skjemainstans-grp-8854>\r\n  </OpplysningerOmArbeidstakeren-grp-8819>\r\n</Skjema>"
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/data?dataType=default",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "dataType",
+									"value": "default"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Instance Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d9a7bcce-99ab-415b-aa34-89618df94a80",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Data - Get Instance Data - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/dataelements",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"dataelements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Change data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8e45154d-3403-4b08-b0b5-c96714696f60",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Data - Edit Instance Data - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<?xml version=\"1.0\"?>\r\n<Skjema xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" skjemanummer=\"1472\" spesifikasjonsnummer=\"9812\" blankettnummer=\"AFP-01\" tittel=\"Arbeidsgiverskjema AFP\" gruppeid=\"8818\">\r\n  <OpplysningerOmArbeidstakeren-grp-8819 gruppeid=\"8819\">\r\n    <Skjemainstans-grp-8854 gruppeid=\"8854\">\r\n      <Journalnummer-datadef-33316 orid=\"33316\">98274</Journalnummer-datadef-33316>\r\n    </Skjemainstans-grp-8854>\r\n  </OpplysningerOmArbeidstakeren-grp-8819>\r\n</Skjema>"
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/data/{{dataGuid}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"data",
+								"{{dataGuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Instance Data by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "56bc83ae-d120-4fbe-b1df-6a478199f58c",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Data - Get Instance Data by ID - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/data/{{dataGuid}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"data",
+								"{{dataGuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE instance data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c9d9e966-5d78-45c6-8b13-8238151efa89",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Data - Delete Instance Data - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/data/{{dataGuid}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"data",
+								"{{dataGuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Add attachment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6363c19f-fcfc-432a-af70-1163a1239512",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Data - Add attachment - Status - 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"     var jsonData = pm.response.json();\r",
+									"    if(pm.expect(jsonData.id).not.eql(null))\r",
+									"    {\r",
+									"        pm.environment.set('dataGuid',jsonData.id);\r",
+									"    }\r",
+									"    pm.expect(jsonData.refs.length).to.equal(1);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9cff461a-3c85-4be0-aca2-7d317445a66e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/octet-stream"
+							},
+							{
+								"key": "Content-Disposition",
+								"value": "attachment; filename=test.pdf",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "test_file_pdf.pdf"
+							}
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/data?dataType={{attachmentElementType}}&refs={{dataGuid}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"data"
+							],
+							"query": [
+								{
+									"key": "dataType",
+									"value": "{{attachmentElementType}}"
+								},
+								{
+									"key": "refs",
+									"value": "{{dataGuid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Attachment Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7a8ed8b1-cebd-47cb-8423-3b6a6b0db272",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Data - Get Attachment Data - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/data/{{dataGuid}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"data",
+								"{{dataGuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Edit Data id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0c8b5c42-3bb1-40c2-ae41-ae5d6d775894",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Data - Edit Data id - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"instanceGuid\": \"{{instanceId}}\",\r\n    \"id\": \"{{dataGuid}}\",\r\n    \"dataType\": \"{{attachmentElementType}}\",\r\n    \"filename\": \"changedName.pdf\",\r\n    \"contentType\": \"application/octet-stream\",\r\n    \"blobStoragePath\": \"{{org}}/{{app}}/{{instanceId}}/data/{{dataGuid}}\",\r\n    \"selfLinks\": {\r\n        \"platform\": \"https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/data/{{dataGuid}}\"\r\n    },\r\n    \"size\": 78593,\r\n    \"locked\": true,\r\n    \"refs\": [\r\n        \"{{instanceId}}\"\r\n    ],\r\n    \"created\": \"2020-01-07T09:16:00.3045148Z\",\r\n    \"lastChanged\": \"2020-01-07T09:16:00.3045148Z\"\r\n}"
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/dataelements/{{dataGuid}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"dataelements",
+								"{{dataGuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Attachment Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "97ffeaf6-e421-437d-892f-293a1985fc96",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Data - Delete Attachment Data - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/data/{{dataGuid}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"data",
+								"{{dataGuid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Events",
+			"item": [
+				{
+					"name": "Add instance event",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "263612e2-2d64-4323-8991-ea0392bdc408",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Event - Add Instance Event - Status - 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.test(\"Platform - Storage - Instance Event - Add Instance Event - Content - Matches\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    if(pm.expect(jsonData.id).not.eql(null))",
+									"    {",
+									"        pm.environment.set('EventId', jsonData.id);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7269a769-1587-422b-a95a-2b5ac7c69a48",
+								"exec": [
+									"pm.environment.set(\"EventId\",\"\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n   \"instanceOwnerId\": \"{{instanceOwnerId}}\",\n   \"instanceId\": \"{{instanceOwnerId}}/{{instanceId}}\",\n   \"eventType\": \"created\",\n   \"userId\": 3,\n   \"authenticationLevel\": 1,\n   \"workflowStep\": \"8\",\n   \"enduserSystemId\": 2\n}"
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/events",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Process History",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4be75274-2cb1-4e02-9667-58811735459b",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Event - Get Process History - Status - 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/process/history",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"process",
+								"history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Event by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8d56233d-7e0f-4720-bceb-b2e731d49d39",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Event - Get Instance Event by ID- Status - 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/events/{{EventId}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"events",
+								"{{EventId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET All Events",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a3d275fb-6722-4a34-8a63-f6dabcdf8f7f",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Event - Get Instance Events - Status - 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Platform - Storage - Instance Event - Get Instance Events - Content - New Id found\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var eventIdFound = false;",
+									"    var createdEventId = pm.environment.get(\"EventId\");",
+									"    for(var i =0; i<jsonData.instanceEvents.length; i++)",
+									"    {",
+									"        if(jsonData.instanceEvents[i].id == createdEventId)",
+									"        {",
+									"            eventIdFound = true;",
+									"            break;",
+									"        }",
+									"    }",
+									"        pm.expect(eventIdFound).to.equal(true);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/events",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Events with type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "58acb9fb-45da-44e7-b2c4-38ca99a56445",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Event - Get Instance Events by type - Content - Created type events found\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    var jsonData = pm.response.json();",
+									"    var eventTypeCreated = 'true';",
+									"    for(var i =0; i<jsonData.length; i++)",
+									"    {",
+									"        if(jsonData[i].eventType != 'created')",
+									"        {",
+									"            eventTypeCreated = 'false';",
+									"            break;    ",
+									"        }",
+									"    }",
+									"    if(eventTypeCreated != 'true')",
+									"    {",
+									"        pm.expect(eventIdFound).to.equal(true);",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/events/?eventTypes=created",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"events",
+								""
+							],
+							"query": [
+								{
+									"key": "eventTypes",
+									"value": "created"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Events not retrieved by wrong time",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e675ae2a-b3ef-4fbf-86a5-90534d783811",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance Event - No Instance Events - Status - 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Platform - Storage - Instance Event - No Instance Events - Content - Matches\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.instanceEvents.length === 0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "929009d0-fe03-48c6-9aba-2bf912fd4f23",
+								"exec": [
+									"var currentDate = new Date();",
+									"var hoursToMinus = currentDate.getHours() - 1;",
+									"currentDate.setHours(hoursToMinus);",
+									"pm.environment.set(\"fromDate\", currentDate);",
+									"var currentDate1 = new Date();",
+									"var hoursToAdd = currentDate1.getHours() + 5;",
+									"currentDate1.setHours(hoursToAdd);",
+									"pm.environment.set(\"toDate\", currentDate1);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}/events/?from=2018-05-22T08:42:53&to=2018-06-22T08:42:53",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"events",
+								""
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "2018-05-22T08:42:53"
+								},
+								{
+									"key": "to",
+									"value": "2018-06-22T08:42:53"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "SBL",
+			"item": [
+				{
+					"name": "POST Add instance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d928e12e-3b9f-4e6d-b9d3-23c72404b8e7",
+								"exec": [
+									"if(pm.response.code == 201)\r",
+									"{\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var instanceId = jsonData.id;\r",
+									"    instanceId = instanceId.toString();\r",
+									"    instanceId = instanceId.split('/');\r",
+									"    instanceId = instanceId[1];\r",
+									"    pm.environment.set('instanceId',instanceId);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "add8883e-8728-4b84-b451-f1da6fff1c96",
+								"exec": [
+									"pm.environment.set(\"instanceId\",\"\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instanceOwner\": {\n    \t\"partyId\": \"{{instanceOwnerId}}\"\n    },\n    \"appId\" : \"{{org}}/{{app}}\",\n    \"dueBefore\": \"2019-06-01T12:00:00Z\",\n    \"visibleAfter\": \"2019-05-20T00:00:00Z\",\n    \"title\": { \"nb\": \"Arbeidsmelding\" },\n    \"process\": {\n        \"started\": \"{{current_timestamp}}\",\n        \"startEvent\": \"StartEvent_1\",\n        \"currentTask\": {\n            \"flow\": 2,\n            \"started\": \"{{current_timestamp}}\",\n            \"elementId\": \"Task_1\",\n            \"name\": \"Utfylling\",\n            \"altinnTaskType\": \"data\",\n            \"ended\": null,\n            \"validated\": null\n        },\n        \"ended\": null,\n        \"endEvent\": null\n    }\n}"
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances?appId={{org}}/{{app}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances"
+							],
+							"query": [
+								{
+									"key": "appId",
+									"value": "{{org}}/{{app}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST visibleDate in the future",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "262666b4-2fec-4f9f-8f0a-2c80c92bf9b6",
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"if(pm.response.code == 201)\r",
+									"{\r",
+									"    var instanceId = jsonData.id;\r",
+									"    instanceId = instanceId.toString();\r",
+									"    instanceId = instanceId.split('/');\r",
+									"    instanceId = instanceId[1];\r",
+									"    pm.environment.set('FutureDateinstanceId',instanceId);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b4d813eb-c31b-4bde-8f23-6ad3c40293d1",
+								"exec": [
+									"pm.environment.set(\"FutureDateinstanceId\",\"\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"instanceOwner\": {\n    \t\"partyId\": \"{{instanceOwnerId}}\"\n    },\n    \"appId\" : \"{{org}}/{{app}}\",\n    \"dueBefore\": \"2019-06-01T12:00:00Z\",\n    \"visibleAfter\": \"2021-05-20T00:00:00Z\",\n    \"title\": { \"nb\": \"Arbeidsmelding\" },\n    \"process\": {\n        \"started\": \"{{current_timestamp}}\",\n        \"startEvent\": \"StartEvent_1\",\n        \"currentTask\": {\n            \"flow\": 2,\n            \"started\": \"{{current_timestamp}}\",\n            \"elementId\": \"Task_1\",\n            \"name\": \"Utfylling\",\n            \"altinnTaskType\": \"data\",\n            \"ended\": null,\n            \"validated\": null\n        },\n        \"ended\": null,\n        \"endEvent\": null\n    }\n}"
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances?appId={{org}}/{{app}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances"
+							],
+							"query": [
+								{
+									"key": "appId",
+									"value": "{{org}}/{{app}}"
+								}
+							]
+						},
+						"description": "Should be able to GET instances with visibleDate set in the future"
+					},
+					"response": []
+				},
+				{
+					"name": "GET All instances",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "65368e33-0f1c-4746-9a15-1fbf98b962d0",
+								"exec": [
+									"pm.test(\"Platform - Storage - SBL - Get Instances for SBL - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Platform - Storage - SBL - GET Instances for SBL - Content - Does not contain future visible instances\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.not.contain(pm.environment.get(\"FutureDateinstanceId\"));\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/sbl/instances/{{instanceOwnerId}}?state=active&language=nb",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"sbl",
+								"instances",
+								"{{instanceOwnerId}}"
+							],
+							"query": [
+								{
+									"key": "state",
+									"value": "active"
+								},
+								{
+									"key": "language",
+									"value": "nb"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Soft Delete Instance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a9e0f8a6-fe9f-44d5-bc31-380d0bd3e634",
+								"exec": [
+									"pm.test(\"Platform - Storage - SBL - Soft Delete Instance - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Platform - Storage - SBL - Soft Delete Instance - Content - Matches\", function () {\r",
+									"    pm.expect(pm.response.text()).equal('true');\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/sbl/instances/{{instanceOwnerId}}/{{instanceId}}?hard=false",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"sbl",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}"
+							],
+							"query": [
+								{
+									"key": "hard",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Restore Deleted message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "61e3c084-a796-4af1-92e5-918061fcc8ce",
+								"exec": [
+									"pm.test(\"Platform - Storage - SBL - Restore Instance - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.expect(pm.response.text()).equal('true');\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/sbl/instances/{{instanceOwnerId}}/{{instanceId}}/undelete",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"sbl",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"undelete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Instance by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7bd5c8c4-4970-4a88-ab68-33bf17901b9d",
+								"exec": [
+									"pm.test(\"Platform - Storage - SBL - Get Instance by id for SBL - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Platform - Storage - SBL - Get Instance by id for SBL - Verify - Restored Instance\", function () {\r",
+									"    var instanceId = pm.environment.get('instanceId');\r",
+									"    pm.expect(pm.response.json().id).equal(instanceId);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/sbl/instances/{{instanceOwnerId}}/{{instanceId}}",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"sbl",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Instance Events",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "28587f7e-99a9-4fb3-a201-58a7ddfc3c1f",
+								"exec": [
+									"pm.test(\"Platform - Storage - SBL - Get Instance events - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Platform - Storage - SBL - Get Instance Events for SBL - Status - Content\", function (){\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var eventsCount = jsonData.length;\r",
+									"    pm.expect(eventsCount).to.equal(3);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/sbl/instances/{{instanceOwnerId}}/{{instanceId}}/events",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"sbl",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Hard Delete Instance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7a532e2b-dfc4-4169-a703-344fa6f90b22",
+								"exec": [
+									"pm.test(\"Platform - Storage - Instance - Delete Instance - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.expect(pm.response.text()).equal('true');\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/sbl/instances/{{instanceOwnerId}}/{{instanceId}}?hard=true",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"sbl",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}"
+							],
+							"query": [
+								{
+									"key": "hard",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Hard Delete future Instance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0e6c99f3-08d4-4329-bd3a-eee2dc8a64ac",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/sbl/instances/{{instanceOwnerId}}/{{FutureDateinstanceId}}?hard=true",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"sbl",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{FutureDateinstanceId}}"
+							],
+							"query": [
+								{
+									"key": "hard",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Restore Hard Deleted message - negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "17e3f6e3-c84f-4536-80bf-1eafc8e9f462",
+								"exec": [
+									"pm.test(\"Platform - Storage - SBL - Restore Instance - Status - 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"    pm.expect(pm.response.text()).to.include(\"Instance was permanently deleted and cannot be restored\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/sbl/instances/{{instanceOwnerId}}/{{instanceId}}/undelete",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"sbl",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}",
+								"undelete"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Receipt",
+			"item": [
+				{
+					"name": "GET Receipt",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f2cec350-53bc-4a2d-8b6b-2d760b8bf985",
+								"exec": [
+									"pm.test(\"Platform - Receipt - GET Receipt - Status - 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Platform - Receipt - GET Receipt - Content - Includes party info\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var instanceOwnerId = pm.environment.get(\"instanceOwnerId\");\r",
+									"    pm.expect(jsonData.party.partyId).to.equal(instanceOwnerId);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/receipt/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}?includeParty=true",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"receipt",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}"
+							],
+							"query": [
+								{
+									"key": "includeParty",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "CleanUp",
+			"item": [
+				{
+					"name": "GET Instances by InstanceOwnerID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8789c04b-e2f8-46ed-8543-45b64a9b3b1f",
+								"exec": [
+									"if (pm.response.code == 200)",
+									"{",
+									"    var jsonData = pm.response.json();",
+									"    var instanceCount = jsonData.length;",
+									"    if (instanceCount !== 0)",
+									"    {",
+									"        var instanceId = jsonData[0].id;",
+									"        pm.environment.set('instanceId', instanceId);",
+									"    }",
+									"    else",
+									"    {",
+									"        postman.setNextRequest(\"DELETE App\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/hal+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/sbl/instances/{{instanceOwnerId}}?state=active&language=nb",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"sbl",
+								"instances",
+								"{{instanceOwnerId}}"
+							],
+							"query": [
+								{
+									"key": "state",
+									"value": "active"
+								},
+								{
+									"key": "language",
+									"value": "nb"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CleanUp App instances",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f56ae104-935d-43a1-87a5-71f14d52b66f",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/instances/{{instanceOwnerId}}/{{instanceId}}?hard=true",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"instances",
+								"{{instanceOwnerId}}",
+								"{{instanceId}}"
+							],
+							"query": [
+								{
+									"key": "hard",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check for more instances",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b58861ce-ace0-4759-b90d-8db68f4042a7",
+								"exec": [
+									"if (pm.response.code == 200)",
+									"    {",
+									"    var jsonData = pm.response.json();",
+									"    var instanceCount = jsonData.length;",
+									"    if (instanceCount !== 0)",
+									"    {",
+									"        var instanceId = jsonData[0].id;",
+									"        pm.environment.set('instanceId', instanceId);",
+									"        postman.setNextRequest(\"CleanUp App instances\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AltinnStudioRuntime}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/hal+json"
+							}
+						],
+						"url": {
+							"raw": "https://platform.{{envUrl}}/storage/api/v1/sbl/instances/{{instanceOwnerId}}?state=active&language=nb",
+							"protocol": "https",
+							"host": [
+								"platform",
+								"{{envUrl}}"
+							],
+							"path": [
+								"storage",
+								"api",
+								"v1",
+								"sbl",
+								"instances",
+								"{{instanceOwnerId}}"
+							],
+							"query": [
+								{
+									"key": "state",
+									"value": "active"
+								},
+								{
+									"key": "language",
+									"value": "nb"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "DELETE App",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "98be1a1a-fd44-4dfc-ad52-4848fb6699b3",
+						"exec": [
+							"pm.test(\"Platform - Storage - Applications - Delete App - Not possible for an user - Status - 403\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AltinnStudioRuntime}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://platform.{{envUrl}}/storage/api/v1/applications/{{org}}/{{app}}?hard=true",
+					"protocol": "https",
+					"host": [
+						"platform",
+						"{{envUrl}}"
+					],
+					"path": [
+						"storage",
+						"api",
+						"v1",
+						"applications",
+						"{{org}}",
+						"{{app}}"
+					],
+					"query": [
+						{
+							"key": "hard",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "name": "altinncore",
+  "private": true,
+  "scripts": {
+    "gulp": "gulp",
+    "gulp-clean": "gulp clean",
+    "gulp-develop": "gulp develop",
+    "gulp-install-deps": "gulp install-react-app-dependencies",
+    "gulp-copy-files": "gulp copy-files",
+    "gulp-build-ux-editor": "gulp build-ux-editor",
+    "gulp-develop-dashboard": "gulp develop-dashboard"
+  },
+  "devDependencies": {
+    "chokidar": "3.4.2",
+    "cross-env": "7.0.2",
+    "del": "5.1.0",
+    "gulp": "4.0.2",
+    "gulp-run-command": "0.0.10",
+    "lerna": "3.22.1",
+    "webpack": "4.44.2",
+    "webpack-cli": "3.3.12"
+  },
+  "dependencies": {
+    "bootstrap": "4.5.2",
+    "bootstrap-list-filter": "0.3.3",
+    "jquery": "3.5.1",
+    "jquery-ui-dist": "1.12.1",
+    "jquery-validation": "1.19.2",
+    "jquery-validation-unobtrusive": "3.2.11",
+    "js-beautify": "1.13.0",
+    "json-editor": "0.7.28",
+    "monaco-editor": "0.21.1",
+    "popper.js": "1.16.1",
+    "requirejs": "2.3.6",
+    "requirejs-text": "2.0.15",
+    "rivets": "0.9.6",
+    "select2": "4.0.13",
+    "sightglass": "0.2.6",
+    "underscore": "1.11.0"
+  }
+}
