@@ -63,52 +63,8 @@ namespace Altinn.Platform.Authorization.Services.Implementation
         private async Task EnrichResourceAttributes(XacmlContextRequest request)
         {
             XacmlContextAttributes resourceContextAttributes = request.GetResourceAttributes();
-            XacmlResourceAttributes resourceAttributes = GetResourceAttributeValues(resourceContextAttributes);
 
-            bool resourceAttributeComplete = false;
-
-            if (!string.IsNullOrEmpty(resourceAttributes.OrgValue) &&
-                !string.IsNullOrEmpty(resourceAttributes.AppValue) &&
-                !string.IsNullOrEmpty(resourceAttributes.InstanceValue) &&
-                !string.IsNullOrEmpty(resourceAttributes.ResourcePartyValue) &&
-                !string.IsNullOrEmpty(resourceAttributes.TaskValue))
-            {
-                // The resource attributes are complete
-                resourceAttributeComplete = true;
-            }
-            else if (!string.IsNullOrEmpty(resourceAttributes.OrgValue) &&
-                !string.IsNullOrEmpty(resourceAttributes.AppValue) &&
-                string.IsNullOrEmpty(resourceAttributes.InstanceValue) &&
-                !string.IsNullOrEmpty(resourceAttributes.ResourcePartyValue) &&
-                string.IsNullOrEmpty(resourceAttributes.TaskValue))
-            {
-                // The resource attributes are complete
-                resourceAttributeComplete = true;
-            }
-
-            if (!resourceAttributeComplete && !string.IsNullOrEmpty(resourceAttributes.InstanceValue))
-            {
-                Instance instanceData = await _policyInformationRepository.GetInstance(resourceAttributes.InstanceValue);
-                if (instanceData != null)
-                {
-                    AddIfValueDoesNotExist(resourceContextAttributes, XacmlRequestAttribute.OrgAttribute, resourceAttributes.OrgValue, instanceData.Org);
-                    string app = instanceData.AppId.Split("/")[1];
-                    AddIfValueDoesNotExist(resourceContextAttributes, XacmlRequestAttribute.AppAttribute, resourceAttributes.AppValue, app);
-                    if (instanceData.Process?.CurrentTask != null)
-                    {
-                        AddIfValueDoesNotExist(resourceContextAttributes, XacmlRequestAttribute.TaskAttribute, resourceAttributes.TaskValue, instanceData.Process.CurrentTask.ElementId);
-                    }
-                    else if (instanceData.Process?.EndEvent != null)
-                    {
-                        AddIfValueDoesNotExist(resourceContextAttributes, XacmlRequestAttribute.EndEventAttribute, null, instanceData.Process.EndEvent);
-                    }
-
-                    AddIfValueDoesNotExist(resourceContextAttributes, XacmlRequestAttribute.PartyAttribute, resourceAttributes.ResourcePartyValue, instanceData.InstanceOwner.PartyId);
-                    resourceAttributes.ResourcePartyValue = instanceData.InstanceOwner.PartyId;
-                }
-            }
-
-            await EnrichSubjectAttributes(request, resourceAttributes.ResourcePartyValue);
+            await EnrichSubjectAttributes(request, "hap");
         }
 
         private XacmlResourceAttributes GetResourceAttributeValues(XacmlContextAttributes resourceContextAttributes)
@@ -178,7 +134,7 @@ namespace Altinn.Platform.Authorization.Services.Implementation
             XacmlContextAttributes subjectContextAttributes = request.GetSubjectAttributes();
 
             int subjectUserId = 0;
-            int resourcePartyId = Convert.ToInt32(resourceParty);
+            int resourcePartyId = 0;
 
             foreach (XacmlAttribute xacmlAttribute in subjectContextAttributes.Attributes)
             {
@@ -217,6 +173,25 @@ namespace Altinn.Platform.Authorization.Services.Implementation
             {
                 // Key not in cache, so get data.
                 roles = await _rolesWrapper.GetDecisionPointRolesForUser(subjectUserId, resourcePartyId) ?? new List<Role>();
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+               .SetPriority(CacheItemPriority.High)
+               .SetAbsoluteExpiration(new TimeSpan(0, _generalSettings.RoleCacheTimeout, 0));
+
+                _memoryCache.Set(cacheKey, roles, cacheEntryOptions);
+            }
+
+            return roles;
+        }
+
+        private async Task<List<Role>> GetHapRoles(int subjectUserId)
+        {
+            string cacheKey = GetCacheKey(subjectUserId, 1);
+
+            if (!_memoryCache.TryGetValue(cacheKey, out List<Role> roles))
+            {
+                // Key not in cache, so get data.
+                roles = await _rolesWrapper.GetDecisionPointRolesForUser(subjectUserId, 1) ?? new List<Role>();
 
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                .SetPriority(CacheItemPriority.High)

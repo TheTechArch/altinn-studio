@@ -51,6 +51,9 @@
     <None Update="Data\Policies\policy.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Data\Roles\user_1\hap\roles.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\Roles\user_1\party_1000\roles.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -59,6 +62,9 @@
     </None>
     <None Update="Data\Xacml\3.0\AltinnApps\AltinnApps0021Request.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Xacml\3.0\Hap\policy.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Data\Xacml\3.0\PolicyRepository\IIA003Policy.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -49,6 +49,10 @@ namespace Altinn.Platform.Authorization.IntegrationTests.Util
             {
                 requestText = File.ReadAllText(Path.Combine(GetAltinnAppsPath(), testcase + "Request.json"));
             }
+            else if (testcase.Contains("Hap"))
+            {
+                requestText = File.ReadAllText(Path.Combine(GetHapPath(), testcase + "Request.json"));
+            }
             else
             {
                 requestText = File.ReadAllText(Path.Combine(GetConformancePath(), testcase + "Request.json"));
@@ -109,6 +113,10 @@ namespace Altinn.Platform.Authorization.IntegrationTests.Util
             if (testCase.Contains("AltinnApps"))
             {
                 content = File.ReadAllText(Path.Combine(GetAltinnAppsPath(), testCase + "Response.json"));
+            }
+            else if (testCase.Contains("Hap"))
+            {
+                content = File.ReadAllText(Path.Combine(GetHapPath(), testCase + "Response.json"));
             }
             else
             {
@@ -173,6 +181,12 @@ namespace Altinn.Platform.Authorization.IntegrationTests.Util
         {
             string unitTestFolder = Path.GetDirectoryName(new Uri(typeof(AltinnApps_DecisionTests).Assembly.CodeBase).LocalPath);
             return Path.Combine(unitTestFolder, "../../../Data/Xacml/3.0/AltinnApps");
+        }
+
+        private static string GetHapPath()
+        {
+            string unitTestFolder = Path.GetDirectoryName(new Uri(typeof(AltinnApps_DecisionTests).Assembly.CodeBase).LocalPath);
+            return Path.Combine(unitTestFolder, "../../../Data/Xacml/3.0/Hap");
         }
 
         private static string GetConformancePath()

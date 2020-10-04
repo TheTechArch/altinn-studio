@@ -38,6 +38,10 @@ namespace Altinn.Platform.Authorization.IntegrationTests.MockServices
                 return ParsePolicy(testID + "Policy.xml", GetAltinnAppsPath());
               
             }
+            else if (!string.IsNullOrEmpty(testID) && testID.ToLower().Contains("hap"))
+            {
+                return ParsePolicy("Policy.xml", GetHapPath());
+            }
             else
             {
                 return ParsePolicy(testID + "Policy.xml", GetConformancePath());
@@ -93,6 +97,12 @@ namespace Altinn.Platform.Authorization.IntegrationTests.MockServices
         {
             string unitTestFolder = Path.GetDirectoryName(new Uri(typeof(AltinnApps_DecisionTests).Assembly.CodeBase).LocalPath);
             return Path.Combine(unitTestFolder, "../../../Data/Xacml/3.0/AltinnApps");
+        }
+
+        private string GetHapPath()
+        {
+            string unitTestFolder = Path.GetDirectoryName(new Uri(typeof(AltinnApps_DecisionTests).Assembly.CodeBase).LocalPath);
+            return Path.Combine(unitTestFolder, "../../../Data/Xacml/3.0/Hap");
         }
 
         private string GetConformancePath()
